@@ -5,7 +5,9 @@
 
 class HispaGamers{
 
-	private $api_service;
+	private $twitter_service;
+
+	private $twich_service;
 
 
 	protected $loader;
@@ -20,11 +22,15 @@ class HispaGamers{
 	protected $shortname;
 
 
-	public function __construct( $version ) {
+	public function __construct( $version, $twitteroauth ) {
 
 		$this->hispagamers = 'hispagamers';
 		$this->version = $version;
 		$this->shortname = 'hispagamers';
+
+		
+
+		$this->twitter_service = $twitteroauth;
 
 		$this->load_dependencies();
 

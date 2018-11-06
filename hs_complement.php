@@ -42,6 +42,11 @@ function deactivate_hs(){
 }
 
 
+$consumer_key = '';
+$consumer_secret = '';
+$access_token = '';
+$access_token_secret = '';
+
 register_activation_hook( __FILE__, 'activate_hs' );
 
 register_deactivation_hook( __FILE__, 'deactivate_hs' );
@@ -49,10 +54,19 @@ register_deactivation_hook( __FILE__, 'deactivate_hs' );
 
 require plugin_dir_path( __FILE__ ) . 'includes/class-hispagamers.php';
 
+require plugin_dir_path(__FILE__) . 'includes/twitteroauth/autoload.php';
+
+use Abraham\TwitterOAuth\TwitterOAuth;
+
+$connection = new TwitterOAuth($consumer_key, $consumer_secret, $access_token, $access_token_secret);
+
+
+$content = $connection->get("account/verify_credentials");
+
 
 function run_hs() {
 	global $HS_VERSION;
-	$plugin = new HispaGamers($HS_VERSION);
+	$plugin = new HispaGamers($HS_VERSION, $connection);
 	$plugin->run();
 }
 
