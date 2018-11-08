@@ -6,6 +6,9 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin');
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
+
+const devMode = process.env.WEBPACK_ENV !== 'production'
 
 const config = require('./config.json');
 
@@ -33,8 +36,8 @@ function isProduction() {
 // });
 
 const extractCss = new MiniCssExtractPlugin({
-	filename: isProduction() ? '[name].css' : '[nane].[hash].css',
-	chunkFilename: isProduction() ? '[id].css':'[id].[hash].css',
+	filename: devMode ? '[name].css' : '[name].[hash].css',
+	chunkFilename: devMode ? '[id].css':'[id].[hash].css',
 })
 
 plugins.push(extractCss);
@@ -73,6 +76,8 @@ plugins.push(new OptimizeCSSPlugin({
     }
 }));
 
+plugins.push(new VueLoaderPlugin())
+
 // Differ settings based on production flag
 if ( isProduction() ) {
 
@@ -90,7 +95,7 @@ if ( isProduction() ) {
 }
 
 module.exports = {
-	mode:'development',
+	mode: 'none',
     entry: entryPoint,
     output: {
         path: exportPath,
@@ -130,11 +135,13 @@ module.exports = {
         module: {
         rules: [
             {
-                test: /\.js$/,
+                test: /\.m?js$/,
                 exclude: /(node_modules|bower_components)/,
-                loader: 'babel-loader',
-                query: {
-                    presets: ['es2015']
+                use:{
+                	loader:'babel-loader',
+                	options:{
+                		presets: ['@babel/preset-env']
+                	}
                 }
             },
             {
@@ -147,14 +154,17 @@ module.exports = {
             {
                 test: /\.less$/,
                 use: [
-                	isProduction() ? 'style-loader' : MiniCssExtractPlugin.loader,
+                	devMode ? 'vue-style-loader' : MiniCssExtractPlugin.loader,
                 	'css-loader',
                 	'less-loader'
                 ],
             },
             {
                 test: /\.css$/,
-                use: [ 'style-loader', 'css-loader' ]
+                use:[
+                	'vue-style-loader',
+                	'css-loader'
+                ]
             }
         ]
     },
