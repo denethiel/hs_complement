@@ -67,12 +67,17 @@ require plugin_dir_path(__FILE__) . 'includes/twitteroauth/autoload.php';
 use Abraham\TwitterOAuth\TwitterOAuth;
 
 
-
+function define_constant(){
+	define('HGPLUGIN_FILE',__FILE__);
+	define('HGPLUGIN_PATH',dirname(__FILE__));
+	define('HGPLUGIN_ASSETS', plugin_dir_path(__FILE__) . 'assets');
+}
 
 
 
 function run_hs() {
 	global $HS_VERSION;
+	define_constant();
 	$connection = new TwitterOAuth($consumer_key, $consumer_secret, $access_token, $access_token_secret);
 
 

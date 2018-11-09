@@ -129,4 +129,6 @@ typings/
 # FuseBox cache
 .fusebox/
 
+assets/js/
+
 

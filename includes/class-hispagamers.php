@@ -39,10 +39,11 @@ class HispaGamers{
 		$this->define_public_hooks();
 
 
+		$this->define_admin_hooks();
 
-		$statues = $this->twitter_service->post("statuses/update", ["status" => "hello world"]);
+		//$statues = $this->twitter_service->post("statuses/update", ["status" => "hello world"]);
 
-		var_dump($statues);
+		//var_dump($statues);
 	}
 
 	private function load_dependencies()
@@ -52,6 +53,8 @@ class HispaGamers{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-hispagamers-custom-types.php';
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-hispagamers-public.php';
+
+		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-hispagamers-admin.php';
 
 
 		$this->loader = new Hispagamers_Loader();
@@ -81,6 +84,17 @@ class HispaGamers{
 
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_script');
 
+
+	}
+
+	private function define_admin_hooks(){
+		$plugin_admin = new Hispagamers_admin($this->get_hispagamers_name(), $this->get_version());
+
+		$this->loader->add_filter('rest_url', $plugin_admin, 'hg_filter_rest_url');
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
+		$this->loader->add_action('admin_menu',$plugin_admin, 'hg_construct_admin_menu');
+		$this->loader->add_action('admin_bar_menu', $plugin_admin, 'hg_construct_admin_bar', 999);
 
 	}
 
