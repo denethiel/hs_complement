@@ -8,7 +8,7 @@
 		name: 'Home',
 		data(){
 			return{
-				msg: 'Welcome to yout vue.js admin app'
+				msg: 'Soy el bot we'
 			}
 		}
 	}
