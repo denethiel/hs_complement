@@ -8,7 +8,7 @@
 		name: 'Home',
 		data(){
 			return{
-				msg: 'Soy el bot we'
+				msg: 'Soy el bot dos veces we'
 			}
 		}
 	}

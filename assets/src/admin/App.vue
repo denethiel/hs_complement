@@ -12,7 +12,7 @@
           text-color="#fff"
           active-text-color="#ffd04b">
           <el-menu-item index="url" router-link to="/">Bot</el-menu-item>
-          <el-menu-item index="automatic" router-link to="/settings">Configuracion</el-menu-item>
+          <el-menu-item index="settings" router-link to="/settings">Configuracion</el-menu-item>
         </el-menu>
       </el-header>
       <el-main>
@@ -37,7 +37,7 @@
 						$this.$router.push('/')
 						break
 					case 'settings':
-						$this.$router.push('Settigs')
+						$this.$router.push('/settings')
 						break
 				}
 			}
