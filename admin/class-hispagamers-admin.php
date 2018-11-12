@@ -98,39 +98,52 @@ class Hispagamers_admin{
 
 	public function hg_construct_admin_menu(){
 
+		$slug = 'hispagamers';
+		$capability = 'manage_options';
+
 		add_menu_page(
 			'Hispagamers', 
 			'Hispagamers', 
-			'manage_options', 
-			'hispagamers', 
+			$capability, 
+			$slug, 
 			array($this, 'hg_render_admin_index'), 
 			'dashicons-chart-pie', 
 			24 
 		);
+
+		global $submenu;
+
+		if( current_user_can( $capability )){
+			$submenu[ $slug ][] = array(__('Twitter Bot','hg'), $capability, 'admin.php?page=' . $slug . '#/');
+			$submenu[ $slug ][] = array(__('Settings','hg'), $capability, 'admin.php?page=' . $slug . '#/settings');
+		}
+
+
 		
 	}
 
 	public function hg_construct_admin_bar( $wp_admin_bar ){
 
-		$hg_node_args = array(
-			'id' => 'hispagamers',
-			'title' => '<span class="ab-icon"></span>HispaGamers',
-			'href' => admin_url('admin.php?page=hispagamers#/'),
-			'meta' => array(
-				'class' => 'hg-menu-bar',
-			),
-		);
-
-		$hg_settings_node_args = array(
-			'parent' => 'hispagamers',
-			'id' => 'hg_settings',
-			'title' => 'Configuracion',
-			'href' => admin_url('admin.php?page=hispagamers#/settings')
-		);
-
-		$wp_admin_bar->add_node($hg_node_args);
-		$wp_admin_bar->add_node($hg_settings_node_args);
-
+		if(current_user_can('manage_options')){
+			$hg_node_args = array(
+				'id' => 'hispagamers',
+				'title' => '<span class="ab-icon"></span>HispaGamers',
+				'href' => admin_url('admin.php?page=hispagamers#/'),
+				'meta' => array(
+					'class' => 'hg-menu-bar',
+				),
+			);
+	
+			$hg_settings_node_args = array(
+				'parent' => 'hispagamers',
+				'id' => 'hg_settings',
+				'title' => 'Configuracion',
+				'href' => admin_url('admin.php?page=hispagamers#/settings')
+			);
+	
+			$wp_admin_bar->add_node($hg_node_args);
+			$wp_admin_bar->add_node($hg_settings_node_args);
+		}
 
 	}
 
