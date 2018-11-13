@@ -2,7 +2,7 @@
 <div class="wrap">
 
 	<div id="icon-options-general" class="icon32"></div>
-	<h1>HispaGamers</h1>
+	<h1>{{nameView}}</h1>
 
 	<div id="poststuff">
 
@@ -13,17 +13,8 @@
 
 				<div class="meta-box-sortables ui-sortable">
 
-					<div class="postbox">
-
-						<h2><span>{{nameView}}</span></h2>
-
-						<div class="inside">
-							<router-view></router-view>
-						</div>
-						<!-- .inside -->
-
-					</div>
-					<!-- .postbox -->
+					<router-view></router-view>
+					
 
 				</div>
 				<!-- .meta-box-sortables .ui-sortable -->

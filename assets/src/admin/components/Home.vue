@@ -1,6 +1,16 @@
 <template>
 	<div class="home">
-		<span>{{msg}}</span>
+		<div class="postbox">
+
+		<h2><span>Twitter Media Sharing</span></h2>
+
+			<div class="inside">
+				<span>{{msg}}</span>	
+			</div>
+						<!-- .inside -->
+
+	</div>
+		
 	</div>
 </template>
 <script>
