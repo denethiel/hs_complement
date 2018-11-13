@@ -6,7 +6,7 @@ class Hispagamers_admin{
 	private $version;
 
 	public function __construct($hispagamers, $version){
-		$this->hispagamers = $Hispagamers;
+		$this->hispagamers = $hispagamers;
 		$this->version = $version;
 
 	}
@@ -25,6 +25,7 @@ class Hispagamers_admin{
 
 
 	public function enqueue_scripts(){
+		
 		if(!isset( $_GET['page']) || 'hispagamers' != $_GET['page']){
 			return;
 		}
@@ -34,11 +35,10 @@ class Hispagamers_admin{
 		}
 
 		global $wp_version;
-
 		$admin_js_vars = array(
 			'rest' => array(
 				'base' => esc_url_raw( rest_url( '/' )),
-				'hgBase' => 'hg/v1/',
+				'hgBase' => 'hs/v1/',
 				'nonce' => wp_create_nonce('wp_rest'),
 			),
 			'adminUrls' => array(

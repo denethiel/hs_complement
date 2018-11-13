@@ -4,8 +4,8 @@ import axios from 'axios'
 
 
 const WP = {
-	url : HG_WP.rest.base + HG_WP.rest.hgBase,
-	nonce : HG_WP.rest.nonce
+  url : HG_WP.rest.base + HG_WP.rest.hgBase,
+  nonce: HG_WP.rest.nonce
 }
 const wordpress_api = axios.create({
 	baseURL:WP.url,
@@ -29,21 +29,50 @@ export default new Vuex.Store({
 		}
 	},
 	getters:{
-		getTwitterConfig: state => {
+		twitter_form: state => {
 			return state.twitter_form
 		},
-		getTwitchConfig: state => {
+		twitch_form: state => {
 			return state.twitch_form
 		}
 	},
 	mutations: {
-
+		updateTwitterConfiguration(state, config) {
+			state.twitter_form = config
+		},
+		updateTwitchConfiguration(state, config){
+			state.twitch_form = config
+		}
 	},
-	actions: {
+  actions: {
 		getConfiguration({commit, state}) {
-			console.log(WP.url)
 			wordpress_api.get('settings').then(response => {
+				
+				var twitter = {
+					consumerKey: response.data.data.hg_twitter_consumerKey,
+					consumerKeySecret: response.data.data.hg_twitter_consumerKeySecret,
+					accessToken: response.data.data.hg_twitter_accessToken,
+					accessTokenSecret: response.data.data.hg_twitter_accessTokenSecret
+				}
+				var twitch =  {
+					client_id: response.data.data.hg_twitch_client_id
+				}
+				commit("updateTwitterConfiguration", twitter)
+				commit("updateTwitchConfiguration", twitch)
+
+			})
+		},
+		setConfiguration({commit, state}){
+			wordpress_api.post('settings',{
+				hg_twitter_consumerKey: state.twitter_form.consumerKey,
+				hg_twitter_consumerKeySecret: state.twitter_form.consumerKeySecret,
+				hg_twitter_accessToken: state.twitter_form.accessToken,
+				hg_twitter_accessTokenSecret: state.twitter_form.accessTokenSecret,
+				hg_twitch_client_id: state.twitch_form.client_id
+			}).then(response => {
 				console.log(response)
+				commit("updateTwitterConfiguration", state.twitter_form)
+				commit("updateTwitchConfiguration", state.twitch_form)
 			})
 		}
 	}

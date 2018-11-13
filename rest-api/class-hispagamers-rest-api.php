@@ -2,7 +2,7 @@
 
 
 class Hispagamers_Rest_Api {
-	const REST_NAMESPACE = 'hg/v1';
+	const REST_NAMESPACE = 'hs/v1';
 
 	const TWICH_API_BASE = 'https://api.twitch.tv/helix/';
 
@@ -12,8 +12,8 @@ class Hispagamers_Rest_Api {
 
 	protected $version;
 
-	public function __construct($api_service, $version){
-		$this->api_service = $api_service;
+	public function __construct( $version){
+		//$this->api_service = $api_service;
 		$this->version = $version;
 	}
 
@@ -94,7 +94,7 @@ class Hispagamers_Rest_Api {
 		$schema = $this->hg_get_settings_schema();
 		$should_update = is_array($new_settings);
 
-		foreach($shcema['properties'] as $key => $schema_value ){
+		foreach($schema['properties'] as $key => $schema_value ){
 			$should_update_param = $should_update && isset($new_settings[$key]) && false === $schema_value['readonly'];
 			if($should_update_param ){
 				update_option($key, $new_settings[$key]);

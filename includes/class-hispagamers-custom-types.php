@@ -114,7 +114,7 @@ class Hispagamers_custom_types{
 				'hierarchical'=>$args['hierarchical'],
 				'labels'=>$labels,
 				'public'=>true,
-				'rewrite'=>array('slug'=>$args['slug']),
+				'rewrite'=>array('slug' => $args['slug']),
 			);
 		register_taxonomy( $tax, $args['post_type'], $tax_args );
 		}

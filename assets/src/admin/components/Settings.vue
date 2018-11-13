@@ -35,8 +35,10 @@
 					<el-form-item label="Consumer Key">
 						<el-input v-model="twitch_form.client_id"></el-input>
 					</el-form-item>
+					<el-form-item>
+					    <el-button type="primary" @click="onSubmit">Guardar</el-button>
+					  </el-form-item>
 				</el-form>
-				<el-button :plain="true" @click="open">Show message</el-button>
 			</div>
 						<!-- .inside -->
 
@@ -46,21 +48,22 @@
 
 <script>
 	import Twitch from './Twitch.vue'
+	import { mapGetters } from 'vuex';
 	export default{
 		name:'Settigs',
 		data(){
 			return{
+				//twitter_form:null,
+				//twitch_form:null
 			};
 		},
 		computed:{
-			twitter_form () {
-				return this.$store.getters.getTwitterConfig
-			},
-			twitch_form () {
-				return this.$store.getters.getTwitchConfig
-			}
+			...mapGetters(['twitter_form','twitch_form'])
 		},
 		methods:{
+			onSubmit(){
+				this.$store.dispatch('setConfiguration', this.twitter_form, this.twitch_form)
+			},
 			open() {
 		       this.$notify({
 		          title: 'Success',

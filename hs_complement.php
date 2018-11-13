@@ -49,23 +49,12 @@ function complement_vc_map(){
 
 add_action('vc_after_init', 'complement_vc_map');
 
-
-$consumer_key = 'tm7nueKh1U1QShxP0Gb8A';
-$consumer_secret = 'Ka4s3zjrE7K5JaWU0pvdzu16WC34r6jx01TYzPgSOSU';
-$access_token = '545681441-CQscmMOUJTEXEpf5cpTgj7zwsL7JDvgNk4YHaEJT';
-$access_token_secret = 'hhTeh3woVW6G956gl3Z4fNPzAdMmOkP1DekL5IzK63EBG';
-
 register_activation_hook( __FILE__, 'activate_hs' );
 
 register_deactivation_hook( __FILE__, 'deactivate_hs' );
 
 
 require plugin_dir_path( __FILE__ ) . 'includes/class-hispagamers.php';
-
-require plugin_dir_path(__FILE__) . 'includes/twitteroauth/autoload.php';
-
-use Abraham\TwitterOAuth\TwitterOAuth;
-
 
 function define_constant(){
 	define('HGPLUGIN_FILE',__FILE__);
@@ -78,11 +67,7 @@ function define_constant(){
 function run_hs() {
 	global $HS_VERSION;
 	define_constant();
-	$connection = new TwitterOAuth($consumer_key, $consumer_secret, $access_token, $access_token_secret);
-
-
-	$content = $connection->get("account/verify_credentials");
-	$plugin = new HispaGamers($HS_VERSION, $connection);
+	$plugin = new HispaGamers($HS_VERSION);
 	$plugin->run();
 }
 

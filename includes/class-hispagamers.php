@@ -5,7 +5,6 @@
 
 class HispaGamers{
 
-	private $twitter_service;
 
 	private $twich_service;
 
@@ -22,15 +21,13 @@ class HispaGamers{
 	protected $shortname;
 
 
-	public function __construct( $version, $twitteroauth ) {
+	public function __construct( $version ) {
 
 		$this->hispagamers = 'hispagamers';
 		$this->version = $version;
 		$this->shortname = 'hispagamers';
 
 		
-
-		$this->twitter_service = $twitteroauth;
 
 		$this->load_dependencies();
 
@@ -40,6 +37,8 @@ class HispaGamers{
 
 
 		$this->define_admin_hooks();
+
+		$this->define_rest_api_hooks();
 
 		//$statues = $this->twitter_service->post("statuses/update", ["status" => "hello world"]);
 
@@ -55,6 +54,8 @@ class HispaGamers{
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-hispagamers-public.php';
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-hispagamers-admin.php';
+
+		require_once plugin_dir_path(dirname(__FILE__)) . 'rest-api/class-hispagamers-rest-api.php';
 
 
 		$this->loader = new Hispagamers_Loader();
@@ -96,6 +97,12 @@ class HispaGamers{
 		$this->loader->add_action('admin_menu',$plugin_admin, 'hg_construct_admin_menu');
 		$this->loader->add_action('admin_bar_menu', $plugin_admin, 'hg_construct_admin_bar', 999);
 
+	}
+
+	private function define_rest_api_hooks(){
+		$plugin_rest_api = new Hispagamers_Rest_Api($this->get_version());
+
+		$this->loader->add_action( 'rest_api_init', $plugin_rest_api, 'register_endpoints' );
 	}
 
 	public function get_hispagamers_name(){
