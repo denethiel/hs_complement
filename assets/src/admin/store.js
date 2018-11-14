@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
-
+import { Notification } from 'element-ui';
 
 const WP = {
   url : HG_WP.rest.base + HG_WP.rest.hgBase,
@@ -71,6 +71,12 @@ export default new Vuex.Store({
 				hg_twitch_client_id: state.twitch_form.client_id
 			}).then(response => {
 				console.log(response)
+				Notification({
+		          title: 'Exito',
+		          message: 'Configuracion guardada con exito.',
+		          type: 'success',
+		          offset: 40
+		        });
 				commit("updateTwitterConfiguration", state.twitter_form)
 				commit("updateTwitchConfiguration", state.twitch_form)
 			})

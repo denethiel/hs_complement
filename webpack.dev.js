@@ -8,7 +8,7 @@ module.exports = merge(common,{
   plugins: [
     new BrowserSyncPlugin({
       proxy: {
-        target: 'http://localhost/hs/wp-admin/admin.php?page=hispagamers'
+        target: 'http://hispagamers.localhost/wp-admin/admin.php?page=hispagamers'
       },
       files: [
         '**/*.php'
