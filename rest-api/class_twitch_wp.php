@@ -1,19 +1,36 @@
-<?php  
+<?php 
+
+namespace Twitch;
+
+class Twitch_Api
+{
+	private static $_instance;
 
 
-class Twich_Api_Service {
+	protected static $_client_id;
 
-	const TWICH_API_BASE = 'https://api.twitch.tv/helix/';
+	protected static $_endpoint = 'https://api.twitch.tv/helix/';
 
-	private $client_id;
+	public function __construct()
+	{
 
-
-	public function __construct($client_id){
-		$this->client_id = $client_id;
 	}
 
-	public function api_get($endpoint, $params){
-		$api_url = Twich_Api_Service::TWICH_API_BASE . $endpoint . '?';
+	public static function getInstance()
+  	{
+    if(self::$_instance === null) {
+    	self::$_instance = new self;
+    }
+    return self::$_instance;
+  	}
+
+  	public static function setClientId($client_id)
+  	{
+  		self::$_client_id    = $client_id;
+  	}
+
+  	public function api_get($endpoint, $params){
+		$api_url = self::$_endpoint . $endpoint . '?';
 
 		foreach($params as $key => $values_array){
 			if(!is_array($values_array)){
@@ -25,13 +42,13 @@ class Twich_Api_Service {
 			}
 		}
 
-		$twich_response = wp_remote_get( $api_url, array( 
+		$twitch_response = wp_remote_get( $api_url, array( 
 			'headers' => array(
-				'Client-ID' => $this->client_id,
+				'Client-ID' => self::$_client_id,
 			)
 		) );
 
-		return $this->get_response_body($twich_response);
+		return $this->get_response_body($twitch_response);
 	}
 
 
@@ -44,19 +61,17 @@ class Twich_Api_Service {
 	 * @return    mixed               The response data.
 	 */
 	public function api_post( $endpoint, $params ) {
-		$api_url = Disqus_Api_Service::DISQUS_API_BASE . $endpoint . '.json?'
-			. 'api_secret=' . $this->api_secret
-			. '&access_token=' . $this->access_token;
+		$api_url = self::$_endpoint . $endpoint . '?';
 
-		$dsq_response = wp_remote_post( $api_url, array(
+		$twitch_response = wp_remote_post( $api_url, array(
 			'body' => $params,
 			'headers' => array(
-				'Referer' => '', // Unset referer so we can use secret key.
+				'Client-ID' => self::$_client_id, // Unset referer so we can use secret key.
 			),
 			'method' => 'POST',
 		) );
 
-		return $this->get_response_body( $dsq_response );
+		return $this->get_response_body( $twitch_response );
 	}
 
 
@@ -74,4 +89,7 @@ class Twich_Api_Service {
 		return $response;
 	}
 
+
 }
+
+ ?>

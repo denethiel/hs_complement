@@ -57,6 +57,7 @@ class HispaGamers{
 
 		require_once plugin_dir_path(dirname(__FILE__)) . 'rest-api/class-hispagamers-rest-api.php';
 
+		
 
 		$this->loader = new Hispagamers_Loader();
 
@@ -83,7 +84,7 @@ class HispaGamers{
 
 		$this->loader->add_action('vc_before_init',$plugin_public, 'hispagamers_integrateWithVC');
 
-		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_script');
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_script', 10, 3);
 
 
 	}
@@ -103,6 +104,8 @@ class HispaGamers{
 		$plugin_rest_api = new Hispagamers_Rest_Api($this->get_version());
 
 		$this->loader->add_action( 'rest_api_init', $plugin_rest_api, 'register_endpoints' );
+
+		$this->loader->add_action('save_post', $plugin_rest_api, 'save_twitch_user_id');
 	}
 
 	public function get_hispagamers_name(){

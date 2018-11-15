@@ -12,9 +12,41 @@ class Hispagamers_Rest_Api {
 
 	protected $version;
 
+	private $cb;
+
+	private $twitch_api;
+
 	public function __construct( $version){
 		//$this->api_service = $api_service;
 		$this->version = $version;
+		require_once plugin_dir_path(dirname(__FILE__)) . 'rest-api/codebird.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'rest-api/class_twitch_wp.php';
+		$this->flush_apis();
+	}
+
+	public function flush_apis()
+	{
+		$consumer_key = get_option('hg_twitter_consumerKey', null);
+		$consumer_secret = get_option('hg_twitter_consumerKeySecret', null);
+		$access_token = get_option('hg_twitter_accessToken', null);
+		$access_token_secret = get_option('hg_twitter_accessTokenSecret', null);
+		$client_id = get_option('hg_twitch_client_id', null);
+		if($consumer_key !== null && $consumer_secret !== null && $access_token !== null && $access_token_secret !== null )
+		{
+			\Codebird\Codebird::setConsumerKey($consumer_key, $consumer_secret);
+			$this->cb = \Codebird\Codebird::getInstance();
+			$this->cb->setToken($access_token, $access_token_secret);
+		}
+
+		if($client_id !== null){
+			\Twitch\Twitch_Api::setClientId($client_id);
+			$this->twitch_api = \Twitch\Twitch_Api::getInstance();
+		}
+
+
+
+		// $reply = $this->cb->statuses_update(array(
+		// 	'status' => 'This is a test'));
 	}
 
 	public function rest_admin_only_permission_callback( WP_REST_Request $request ) {
@@ -34,6 +66,27 @@ class Hispagamers_Rest_Api {
 	    	'permissions_callback' => array($this, 'rest_admin_only_permission_callback'),
 		)));
 	}
+
+	public function save_twitch_user_id($post_id){
+
+		$post_type = get_post_type($post_id);
+
+		if('hg_streamer' != $post_type) return;
+
+		$twitch_user = (isset($_POST['hg_streamer_twitch_user'])?$_POST['hg_streamer_twitch_user']:'');
+
+		if($twitch_user === '') return;
+
+		$params = array('login' => $twitch_user);
+		$response = $this->twitch_api->api_get('users',$params);
+		$twitch_id = $response->data[0]->id;
+		$profile_img = $response->data[0]->profile_image_url;
+		update_post_meta($post_id, 'profile_image_url',$profile_img);
+		update_post_meta($post_id, 'twitch_id', $twitch_id);
+
+
+	}
+
 
 
 	public function rest_settings( WP_REST_Request $request ){
