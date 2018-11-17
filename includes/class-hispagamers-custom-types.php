@@ -180,4 +180,41 @@ class Hispagamers_custom_types{
 	);
 	register_post_type( 'hg_streamer', $args );
 	}
+
+
+	public function edit_hs_streamers_columns($columns){
+		$columns = array(
+			'cb' => '<input type="checkbox" />',
+			'title' => __('Nombre'),
+			'avatar' => __('Avatar'),
+			'twitch' => __('Usuario de Twitch'),
+			'date' => __('Fecha')
+		);
+		return $columns;
+	}
+
+	function manage_hs_stream_column($column, $post_id){
+		global $post;
+
+		switch($column){
+			case 'avatar':
+				$avatar_url = get_post_meta($post_id, 'profile_image_url', true);
+				if(!empty($avatar_url)){
+					printf('<img src="%s" / style="width:150px;">',$avatar_url);
+				}
+				break;
+			case 'twitch':
+				$twitch_id = get_post_meta($post_id, 'twitch_id', true);
+				$twitch_name = get_post_meta($post_id, 'hg_streamer_twitch_user', true);
+				if(empty($twitch_name)){
+					echo __('This player dont have stream');
+				}else{
+					printf('<a href="%s" target="_blank"><img src="http://i.imgur.com/Q4Q7gHb.png"/></a>','http://www.twitch.tv/'.$twitch_name);
+				}
+			break;
+			default:
+				break;
+
+		}
+	}
 }

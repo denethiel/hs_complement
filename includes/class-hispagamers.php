@@ -77,6 +77,10 @@ class HispaGamers{
 		$this->loader->add_filter('enter_title_here',$plugin_post_type,'change_defaul_title');
 
 		$this->loader->add_action( 'save_post', $plugin_post_type, 'streamer_meta_save', 10, 2 );
+
+		$this->loader->add_filter('manage_edit-hg_streamer_columns', $plugin_post_type, 'edit_hs_streamers_columns');
+
+		$this->loader->add_filter('manage_hg_streamer_posts_custom_column', $plugin_post_type, 'manage_hs_stream_column', 10, 2);
 	}
 
 	private function define_public_hooks(){
