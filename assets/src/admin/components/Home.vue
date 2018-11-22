@@ -5,7 +5,24 @@
 		<h2><span>Twitter Media Sharing</span></h2>
 
 			<div class="inside">
-				<span>{{msg}}</span>	
+				<el-card class="box-card">
+				  <div slot="header" class="clearfix">
+				    <span>Card name</span>
+				    <el-button style="float: right; padding: 3px 0" type="text">Operation button</el-button>
+				  </div>
+				  <div v-for="o in 4" :key="o" class="text item">
+				    {{'List item ' + o }}
+				  </div>
+				</el-card>
+				<el-card class="box-card">
+				  <div slot="header" class="clearfix">
+				    <span>Card name</span>
+				    <el-button style="float: right; padding: 3px 0" type="text">Operation button</el-button>
+				  </div>
+				  <div v-for="o in 4" :key="o" class="text item">
+				    {{'List item ' + o }}
+				  </div>
+				</el-card>
 			</div>
 						<!-- .inside -->
 
@@ -26,5 +43,7 @@
 
 
 <style scoped>
-	
+	.el-card{
+		margin-bottom: 1em;
+	}
 </style>

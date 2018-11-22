@@ -65,7 +65,103 @@ class Hispagamers_Rest_Api {
 	    	'callback' => array($this, 'rest_settings' ),
 	    	'permissions_callback' => array($this, 'rest_admin_only_permission_callback'),
 		)));
+
+		register_rest_route( Hispagamers_Rest_Api::REST_NAMESPACE, 'current', array(
+			array(
+				'methods' => array('GET'),
+				'callback' => array($this, 'get_current'),
+				'permissions_callback' => array($this, 'rest_admin_only_permission_callback'),
+			)));
 	}
+
+	public function get_current(){
+		// Get All Stream Data from Wordpress
+		$args = array(
+			'post_type' => 'hg_streamer',
+			'post_status' => 'publish',
+			'nopaging' => true,
+			'order' => 'ASC',
+			'orderby' => 'title'
+		);
+
+		$streamers = array();
+		$streamers_ids = array();
+
+		$raw_streamers = new WP_Query($args);
+
+		if($raw_streamers->have_posts()){
+			while($raw_streamers->have_posts()){
+				$raw_streamers->the_post();
+				//information
+				$streamer_id = get_the_ID();
+				$streamers_ids[] = get_post_meta($streamer_id,'twitch_id', true);
+				the_title( '<h3>', '</h3>' );
+			}
+		}else{
+			//No post found
+		}
+		
+		$params = array();
+		$params['user_id'] = $streamers_ids;
+		var_dump($params);
+		$response = $this->twitch_api->api_get('streams', $params);
+		echo "  
+    <style>
+        /* Styling pre tag */
+        pre {
+            padding:10px 20px;
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* ===========================
+        == To use with XDEBUG 
+        =========================== */
+        /* Source file */
+        pre small:nth-child(1) {
+            font-weight: bold;
+            font-size: 14px;
+            color: #CC0000;
+        }
+        pre small:nth-child(1)::after {
+            content: '';
+            position: relative;
+            width: 100%;
+            height: 20px;
+            left: 0;
+            display: block;
+            clear: both;
+        }
+
+        /* Separator */
+        pre i::after{
+            content: '';
+            position: relative;
+            width: 100%;
+            height: 15px;
+            left: 0;
+            display: block;
+            clear: both;
+            border-bottom: 1px solid grey;
+        }  
+    </style>
+    ";
+
+    //=== Content            
+    echo "<pre style='background:$background; color:$color; padding:10px 20px; border:2px inset $color'>";
+    echo    "<h2>$title</h2>";
+            var_dump($response); 
+    echo "</pre>";
+
+		wp_reset_postdata();
+		wp_die();
+	}
+
+
+
 
 	public function save_twitch_user_id($post_id){
 

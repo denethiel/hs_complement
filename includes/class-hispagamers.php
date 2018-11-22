@@ -107,9 +107,12 @@ class HispaGamers{
 	private function define_rest_api_hooks(){
 		$plugin_rest_api = new Hispagamers_Rest_Api($this->get_version());
 
+
 		$this->loader->add_action( 'rest_api_init', $plugin_rest_api, 'register_endpoints' );
 
 		$this->loader->add_action('save_post', $plugin_rest_api, 'save_twitch_user_id');
+
+		$this->loader->add_action('wp_loaded', $plugin_rest_api, 'get_current');
 	}
 
 	public function get_hispagamers_name(){
