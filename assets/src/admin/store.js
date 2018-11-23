@@ -26,7 +26,8 @@ export default new Vuex.Store({
 		},
 		twitch_form:{
 			client_id:''
-		}
+		},
+		streamers:{}
 	},
 	getters:{
 		twitter_form: state => {
@@ -42,9 +43,17 @@ export default new Vuex.Store({
 		},
 		updateTwitchConfiguration(state, config){
 			state.twitch_form = config
+		},
+		updateStreamers(state, streamers){
+			state.streamers = streamers
 		}
 	},
   actions: {
+  		getStreamers({commit, state}){
+  			wordpress_api.get('current').then(response => {
+  				commit("updateStreamers", response.data.data)
+  			})
+  		},
 		getConfiguration({commit, state}) {
 			wordpress_api.get('settings').then(response => {
 				

@@ -92,10 +92,18 @@ class Hispagamers_Rest_Api {
 		if($raw_streamers->have_posts()){
 			while($raw_streamers->have_posts()){
 				$raw_streamers->the_post();
-				//information
-				$streamer_id = get_the_ID();
-				$streamers_ids[] = get_post_meta($streamer_id,'twitch_id', true);
-				the_title( '<h3>', '</h3>' );
+				$streamer_obj = (object)[
+					'name' => get_the_title(),
+					'wp_id' => get_the_ID(),
+					'avatar' => get_post_meta(get_the_ID(), 'profile_image_url', true),
+					'live' => false,
+					'twitch_id' => get_post_meta(get_the_ID(), 'twitch_id', true),
+					'twitch_user' => get_post_meta(get_the_ID(), 
+					'hg_streamer_twitch_user', true),
+					'last_updated' => get_post_meta(get_the_ID(), 
+					'twitter_last_updated', true)];
+				$streamers_ids[] = get_post_meta(get_the_ID(), 'twitch_id', true);
+				$streamers[] =	$streamer_obj;
 			}
 		}else{
 			//No post found
@@ -103,61 +111,23 @@ class Hispagamers_Rest_Api {
 		
 		$params = array();
 		$params['user_id'] = $streamers_ids;
-		var_dump($params);
+		
 		$response = $this->twitch_api->api_get('streams', $params);
-		echo "  
-    <style>
-        /* Styling pre tag */
-        pre {
-            padding:10px 20px;
-            white-space: pre-wrap;
-            white-space: -moz-pre-wrap;
-            white-space: -pre-wrap;
-            white-space: -o-pre-wrap;
-            word-wrap: break-word;
-        }
-
-        /* ===========================
-        == To use with XDEBUG 
-        =========================== */
-        /* Source file */
-        pre small:nth-child(1) {
-            font-weight: bold;
-            font-size: 14px;
-            color: #CC0000;
-        }
-        pre small:nth-child(1)::after {
-            content: '';
-            position: relative;
-            width: 100%;
-            height: 20px;
-            left: 0;
-            display: block;
-            clear: both;
-        }
-
-        /* Separator */
-        pre i::after{
-            content: '';
-            position: relative;
-            width: 100%;
-            height: 15px;
-            left: 0;
-            display: block;
-            clear: both;
-            border-bottom: 1px solid grey;
-        }  
-    </style>
-    ";
-
-    //=== Content            
-    echo "<pre style='background:$background; color:$color; padding:10px 20px; border:2px inset $color'>";
-    echo    "<h2>$title</h2>";
-            var_dump($response); 
-    echo "</pre>";
-
+		
+		foreach ($response->data as $live) {
+			foreach($streamers as $streamer){
+				if($streamer->twitch_id === $live->user_id){
+					$streamer->live = true;
+					$streamer->thumbnail_url = $live->thumbnail_url;
+					$streamer->title = $live->title;
+				}
+			}
+		}
+		usort ($streamers, function ($left, $right) {
+		    return $left->live + $right->live;
+		});
 		wp_reset_postdata();
-		wp_die();
+		return $this->rest_get_response($streamers);
 	}
 
 
@@ -292,6 +262,59 @@ class Hispagamers_Rest_Api {
                 'status' => $status_code,
             )
         );
+    }
+
+    private function _dump($title, $var){
+    	echo "  
+    <style>
+        /* Styling pre tag */
+        pre {
+            padding:10px 20px;
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* ===========================
+        == To use with XDEBUG 
+        =========================== */
+        /* Source file */
+        pre small:nth-child(1) {
+            font-weight: bold;
+            font-size: 14px;
+            color: #CC0000;
+        }
+        pre small:nth-child(1)::after {
+            content: '';
+            position: relative;
+            width: 100%;
+            height: 20px;
+            left: 0;
+            display: block;
+            clear: both;
+        }
+
+        /* Separator */
+        pre i::after{
+            content: '';
+            position: relative;
+            width: 100%;
+            height: 15px;
+            left: 0;
+            display: block;
+            clear: both;
+            border-bottom: 1px solid grey;
+        }  
+    </style>
+    ";
+
+    //=== Content            
+    echo "<pre style='background:$background; color:$color; padding:10px 20px; border:2px inset $color'>";
+    echo    "<h2>$title</h2>";
+            var_dump($var); 
+    echo "</pre>";
     }
 
 

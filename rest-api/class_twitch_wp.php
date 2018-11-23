@@ -42,8 +42,6 @@ class Twitch_Api
 			}
 		}
 
-		var_dump($api_url);
-
 		$twitch_response = wp_remote_get( $api_url, array( 
 			'headers' => array(
 				'Client-ID' => self::$_client_id,

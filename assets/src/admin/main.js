@@ -34,6 +34,7 @@ new Vue({
   render: h => h(App),
   created(){
   	this.$store.dispatch('getConfiguration')
+  	this.$store.dispatch('getStreamers')
   }
 })
 
