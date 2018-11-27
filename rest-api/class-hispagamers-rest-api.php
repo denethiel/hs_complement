@@ -16,14 +16,29 @@ class Hispagamers_Rest_Api {
 
 	private $twitch_api;
 
+	private $_width;
+
+	private $_height;
+
+	/* Este es el constructor de la clase */
+	
 	public function __construct( $version){
 		//$this->api_service = $api_service;
 		$this->version = $version;
 		require_once plugin_dir_path(dirname(__FILE__)) . 'rest-api/codebird.php';
 		require_once plugin_dir_path(dirname(__FILE__)) . 'rest-api/class_twitch_wp.php';
 		$this->flush_apis();
+		$this->_width = '1200';
+		$this->_height =  '675';
 	}
 
+
+	/**
+	 *
+	 * Inicializa las apis con sus respectivas keys
+	 *
+	 */
+	
 	public function flush_apis()
 	{
 		$consumer_key = get_option('hg_twitter_consumerKey', null);
@@ -58,6 +73,8 @@ class Hispagamers_Rest_Api {
         return $this->rest_get_error( 'You must be logged in and have admin permissions for this resource.', 401 );
     }
 
+    /* REST API ENDPOINTS */
+    
 	public function register_endpoints(){
 		register_rest_route( Hispagamers_Rest_Api::REST_NAMESPACE, 'settings', array( 
 	    array(
@@ -72,7 +89,40 @@ class Hispagamers_Rest_Api {
 				'callback' => array($this, 'get_current'),
 				'permissions_callback' => array($this, 'rest_admin_only_permission_callback'),
 			)));
+
+		register_rest_route(Hispagamers_Rest_Api::REST_NAMESPACE, 'post_update', array(
+			array('methods' => array('POST'),
+				'callback' => array($this, 'post_stream'),
+				'permissions_callback' => array($this, 'rest_admin_only_permission_callback'),
+		)));
 	}
+
+	public function post_stream($twitch_id = '4536816' , $wp_id = 33){
+		//$wp_id = 33;
+		//$twitch_id = '4536816';
+		$params = array('user_id' => $twitch_id);
+		$response = $this->twitch_api->api_get('streams', $params);
+		$stream = $response->data[0];
+		$this->_dump($stream);
+		$image_raw_url = $stream->thumbnail_url;
+		$match =  array('{width}','{height}');
+		$replace = array($this->_width, $this->_height);
+		$image_url = str_replace($match, $replace, $image_raw_url);
+		$twitch_user = get_post_meta($wp_id, 'hg_streamer_twitch_user', true);
+		$twitch_url = 'https://www.twitch.tv/' . $twitch_user;
+		$img_reply = $this->cb->media_upload(array(
+			'media' => $image_url
+		));
+		$reply = $this->cb->statuses_update([
+			'status' => '#HispaStreamers' .' '. $stream->title . ' ' . $twitch_url ,
+			'media_ids' => $img_reply->media_id_string
+		]);
+		update_post_meta($wp_id, 'twitter_last_updated', new DateTime('now'));
+		//$this->_dump($reply);
+
+		//p_die();
+	}
+
 
 	public function get_current(){
 		// Get All Stream Data from Wordpress
@@ -264,7 +314,7 @@ class Hispagamers_Rest_Api {
         );
     }
 
-    private function _dump($title, $var){
+    private function _dump($var,$title=''){
     	echo "  
     <style>
         /* Styling pre tag */

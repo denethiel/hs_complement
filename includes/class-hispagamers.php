@@ -112,7 +112,7 @@ class HispaGamers{
 
 		$this->loader->add_action('save_post', $plugin_rest_api, 'save_twitch_user_id');
 
-		//$this->loader->add_action('wp_loaded', $plugin_rest_api, 'get_current');
+		//$this->loader->add_action('wp_loaded', $plugin_rest_api, 'post_stream');
 	}
 
 	public function get_hispagamers_name(){
