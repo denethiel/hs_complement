@@ -20,6 +20,8 @@ class Hispagamers_Rest_Api {
 
 	private $_height;
 
+	protected $loader;
+
 	/* Este es el constructor de la clase */
 	
 	public function __construct( $version){
@@ -30,6 +32,14 @@ class Hispagamers_Rest_Api {
 		$this->flush_apis();
 		$this->_width = '1200';
 		$this->_height =  '675';
+	}
+
+	public function add_5_minutes($scheludes){
+		$scheludes['5_minutes'] = array(
+			'interval' => 300,
+			'display' => __('Cada 5 Minutos')
+		);
+		return $scheludes;
 	}
 
 
@@ -64,6 +74,16 @@ class Hispagamers_Rest_Api {
 		// 	'status' => 'This is a test'));
 	}
 
+	public function run_bot(){
+		if(! wp_next_scheduled( 'hispagamers_bot')) {
+			wp_schedule_event(time(), '5_minutes','hispagamers_bot');
+		}
+	}
+
+	public function stop_bot(){
+		wp_clear_scheduled_hook('hispagamers_bot');
+	}
+
 	public function rest_admin_only_permission_callback( WP_REST_Request $request ) {
         // Regular cookie-based authentication.
         if ( current_user_can( 'manage_options' ) ) {
@@ -90,14 +110,55 @@ class Hispagamers_Rest_Api {
 				'permissions_callback' => array($this, 'rest_admin_only_permission_callback'),
 			)));
 
-		register_rest_route(Hispagamers_Rest_Api::REST_NAMESPACE, 'post_update', array(
+		register_rest_route(Hispagamers_Rest_Api::REST_NAMESPACE, 'post-update', array(
 			array('methods' => array('POST'),
 				'callback' => array($this, 'post_stream'),
 				'permissions_callback' => array($this, 'rest_admin_only_permission_callback'),
 		)));
+
+		register_rest_route(Hispagamers_Rest_Api::REST_NAMESPACE,'manage-bot', array(
+			array('methods' => array('POST','GET'),
+				'callback' => array($this,'manage_bot'),
+				'permissions_callback' => array($this, 'rest_admin_only_permission_callback'),
+			)));
+
+		register_rest_route(Hispagamers_Rest_Api::REST_NAMESPACE,'stop', array(
+			array('methods' => array('POST'),
+				'callback' => array($this,'stop_bot'),
+				'permissions_callback' => array($this, 'rest_admin_only_permission_callback'),
+			)));
 	}
 
-	public function post_stream($twitch_id = '4536816' , $wp_id = 33){
+	public function manage_bot(WP_REST_Request $request){
+		$method = $request->get_method();
+		switch ($method) {
+			case 'GET':
+				# code...
+				$status = array();
+				if(! wp_next_scheduled( 'hispagamers_bot')) {
+					$status['running'] = false;
+				}else{
+					$status['running'] = true;
+				}
+				return $this->rest_get_response($status);
+				break;
+			case 'POST':
+				$params =  $this->get_request_data( $request );
+				if($params['action'] === 'run'){
+					$this->run_bot();
+				}else if($params['action'] === 'stop'){
+					$this->stop_bot();
+				}
+				break;
+			default:
+				# code...
+				break;
+		}
+	}
+
+
+
+	public function post_stream($twitch_id , $wp_id){
 		//$wp_id = 33;
 		//$twitch_id = '4536816';
 		$params = array('user_id' => $twitch_id);
@@ -117,6 +178,7 @@ class Hispagamers_Rest_Api {
 			'status' => '#HispaStreamers' .' '. $stream->title . ' ' . $twitch_url ,
 			'media_ids' => $img_reply->media_id_string
 		]);
+		date_default_timezone_set('America/Mexico_City'); 
 		update_post_meta($wp_id, 'twitter_last_updated', new DateTime('now'));
 		//$this->_dump($reply);
 
@@ -124,8 +186,33 @@ class Hispagamers_Rest_Api {
 	}
 
 
+	public function bot(){
+		$streamers = $this->_get_streamers();
+		foreach ($streamers as $streamer) {
+			if($streamer->live){
+				//time comprobation
+				date_default_timezone_set('America/Mexico_City'); 
+				$now = new DateTime('now');
+				$diff = $streamer->last_updated->diff($now);
+				$seconds = ( ($diff->days * 24 ) * 60 ) + ( $diff->i * 60 ) + $diff->s;
+				if($seconds >= 900){
+					$this->post_stream($streamer->twitch_id, $streamer->wp_id);
+				}
+				
+			}
+		}
+	}
+
 	public function get_current(){
 		// Get All Stream Data from Wordpress
+		$streamers = $this->_get_streamers();
+		usort ($streamers, function ($left, $right) {
+		    return ($right->live === true);
+		});
+		return $this->rest_get_response($streamers);
+	}
+
+	private function _get_streamers(){
 		$args = array(
 			'post_type' => 'hg_streamer',
 			'post_status' => 'publish',
@@ -173,14 +260,10 @@ class Hispagamers_Rest_Api {
 				}
 			}
 		}
-		usort ($streamers, function ($left, $right) {
-		    return $left->live + $right->live;
-		});
+		
 		wp_reset_postdata();
-		return $this->rest_get_response($streamers);
+		return $streamers;
 	}
-
-
 
 
 	public function save_twitch_user_id($post_id){

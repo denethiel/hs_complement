@@ -112,6 +112,10 @@ class HispaGamers{
 
 		$this->loader->add_action('save_post', $plugin_rest_api, 'save_twitch_user_id');
 
+		$this->loader->add_filter( 'cron_schedules', $plugin_rest_api, 'add_5_minutes' );
+
+		$this->loader->add_action( 'hispagamers_bot', $plugin_rest_api, 'bot' );
+
 		//$this->loader->add_action('wp_loaded', $plugin_rest_api, 'post_stream');
 	}
 

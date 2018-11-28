@@ -35,6 +35,8 @@ new Vue({
   created(){
   	this.$store.dispatch('getConfiguration')
   	this.$store.dispatch('getStreamers')
+  	this.$store.dispatch('getStatus')
+  	this.$store.dispatch('runBot')
   }
 })
 

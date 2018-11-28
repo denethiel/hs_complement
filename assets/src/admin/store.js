@@ -27,7 +27,8 @@ export default new Vuex.Store({
 		twitch_form:{
 			client_id:''
 		},
-		streamers:{}
+		streamers:{},
+		running:'',
 	},
 	getters:{
 		twitter_form: state => {
@@ -52,6 +53,37 @@ export default new Vuex.Store({
   		getStreamers({commit, state}){
   			wordpress_api.get('current').then(response => {
   				commit("updateStreamers", response.data.data)
+  			})
+  		},
+  		getStatus({commit, state}){
+  			console.log('GetStatus')
+  			wordpress_api.get('manage-bot').then(response => {
+  				state.running = response.data.data.running
+  				
+  			})
+  		},
+  		runBot({commit, state}){
+  			wordpress_api.post('manage-bot',{
+  				'action': 'run'
+  			}).then(response => {
+  				Notification({
+		          title: 'Exito',
+		          message: 'Bot Iniciado con exito.',
+		          type: 'success',
+		          offset: 40
+		        });
+  			})
+  		},
+  		stopBot({commit, state}){
+  			wordpress_api.post('manage-bot',{
+  				'action':'stop'
+  			}).then(response => {
+  				Notification({
+		          title: 'Exito',
+		          message: 'Bot Apagado con exito.',
+		          type: 'success',
+		          offset: 40
+		        });
   			})
   		},
 		getConfiguration({commit, state}) {
