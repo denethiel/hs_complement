@@ -193,11 +193,16 @@ class Hispagamers_Rest_Api {
 				//time comprobation
 				date_default_timezone_set('America/Mexico_City'); 
 				$now = new DateTime('now');
-				$diff = $streamer->last_updated->diff($now);
-				$seconds = ( ($diff->days * 24 ) * 60 ) + ( $diff->i * 60 ) + $diff->s;
-				if($seconds >= 900){
+				if($streamer->last_updated === ''){
 					$this->post_stream($streamer->twitch_id, $streamer->wp_id);
+				}else{
+					$diff = $streamer->last_updated->diff($now);
+					$seconds = ( ($diff->days * 24 ) * 60 ) + ( $diff->i * 60 ) + $diff->s;
+					if($seconds >= 900){
+						$this->post_stream($streamer->twitch_id, $streamer->wp_id);
+					}
 				}
+				
 				
 			}
 		}

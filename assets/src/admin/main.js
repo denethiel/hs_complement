@@ -36,7 +36,7 @@ new Vue({
   	this.$store.dispatch('getConfiguration')
   	this.$store.dispatch('getStreamers')
   	this.$store.dispatch('getStatus')
-  	this.$store.dispatch('runBot')
+  	this.$store.dispatch('stopBot')
   }
 })
 
