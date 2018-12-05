@@ -47,6 +47,9 @@ export default new Vuex.Store({
 		},
 		updateStreamers(state, streamers){
 			state.streamers = streamers
+		},
+		updateRunningState(state, value){
+			state.running = value
 		}
 	},
   actions: {
@@ -54,6 +57,34 @@ export default new Vuex.Store({
   			wordpress_api.get('current').then(response => {
   				commit("updateStreamers", response.data.data)
   			})
+  		},
+  		toogleBot({commit, state}, value){
+  			console.log(value)
+
+  			if(value){ //true
+  				wordpress_api.post('manage-bot',{
+  				'action': 'run'
+	  			}).then(response => {
+	  				Notification({
+			          title: 'Exito',
+			          message: 'Bot Iniciado con exito.',
+			          type: 'success',
+			          offset: 40
+			        });
+	  			})
+  			}else{
+  				wordpress_api.post('manage-bot',{
+  				'action':'stop'
+	  			}).then(response => {
+	  				Notification({
+			          title: 'Exito',
+			          message: 'Bot Apagado con exito.',
+			          type: 'success',
+			          offset: 40
+			        });
+	  			})
+  			}
+  			commit("updateRunningState", value)
   		},
   		getStatus({commit, state}){
   			console.log('GetStatus')
@@ -63,28 +94,10 @@ export default new Vuex.Store({
   			})
   		},
   		runBot({commit, state}){
-  			wordpress_api.post('manage-bot',{
-  				'action': 'run'
-  			}).then(response => {
-  				Notification({
-		          title: 'Exito',
-		          message: 'Bot Iniciado con exito.',
-		          type: 'success',
-		          offset: 40
-		        });
-  			})
+  			
   		},
   		stopBot({commit, state}){
-  			wordpress_api.post('manage-bot',{
-  				'action':'stop'
-  			}).then(response => {
-  				Notification({
-		          title: 'Exito',
-		          message: 'Bot Apagado con exito.',
-		          type: 'success',
-		          offset: 40
-		        });
-  			})
+  			
   		},
 		getConfiguration({commit, state}) {
 			wordpress_api.get('settings').then(response => {

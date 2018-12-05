@@ -32,7 +32,7 @@
 						<h2><span></span></h2>
 
 						<div class="inside">
-							<p>Aqui iran otras cosas></p>
+							<bot></bot>
 						</div>
 						<!-- .inside -->
 
@@ -56,11 +56,15 @@
 </template>
 
 <script>
+	import Bot from './components/Bot.vue'
 	export default {
 		data(){
 			return {
 				activeIndex:'Home'
 			}
+		},
+		components:{
+			bot: Bot
 		},
 		computed:{
 			nameView(){
